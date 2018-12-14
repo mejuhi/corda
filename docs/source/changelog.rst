@@ -6,6 +6,8 @@ release, see :doc:`upgrade-notes`.
 
 Unreleased
 ----------
+* Fixed race condition between ``NodeVaultService.trackBy`` and ``NodeVaultService.notifyAll``, where there could be states that were not reflected
+  in the data feed returned from ``trackBy`` (either in the query's result snapshot or the observable).
 
 * Transaction building and verification enforces new contract attachment version non-downgrade rule.
   For a given contract class, the contract attachment of the output states must be of the same or newer version than the contract attachment of the input states.
