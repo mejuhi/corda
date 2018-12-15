@@ -558,8 +558,8 @@ class DriverDSLImpl(
 
         // Instead of using cordappsForAllNodes we get only these that are missing from additionalCordapps
         // This way we prevent errors when we want the same CordApp but with different config
-        val appOverrides = parameters.additionalCordapps.map { it.name to it.version }.toSet()
-        val baseCordapps = cordappsForAllNodes.filter { !appOverrides.contains(it.name to it.version) }
+        val appOverrides = parameters.additionalCordapps.map { it.name to it.versionId }.toSet()
+        val baseCordapps = cordappsForAllNodes.filter { !appOverrides.contains(it.name to it.versionId) }
 
         val cordappDirectories = existingCorDappDirectories + (baseCordapps + parameters.additionalCordapps).map { TestCordappDirectories.getJarDirectory(it, signJar = signCordapps).toString() }
 

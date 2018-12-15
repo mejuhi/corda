@@ -77,7 +77,7 @@ class FinalityFlowTests : WithFinality {
     @Test
     fun `allow use of the old API if the CorDapp target version is 3`() {
         // We need Bob to load at least one old CorDapp so that its FinalityHandler is enabled
-        val bob = createBob(cordapps = listOf(cordappForPackages("com.template").withTargetVersion(3)))
+        val bob = createBob(cordapps = listOf(cordappForPackages("com.template").withTargetPlatformVersion(3)))
         val stx = aliceNode.issuesCashTo(bob)
         val resultFuture = CordappResolver.withCordapp(targetPlatformVersion = 3) {
             @Suppress("DEPRECATION")

@@ -31,7 +31,7 @@ object TestCordappDirectories {
                 } else {
                     "$packages$classes$configString".toByteArray().sha256().toString()
                 }
-                "${name}_${vendor}_${title}_${version}_${targetVersion}_$uniqueScanString".replace(whitespace, "-")
+                "${name}_${versionId}_${targetPlatformVersion}_$uniqueScanString".replace(whitespace, "-")
             }
             val cordappDir = cordappsDirectory / UUID.randomUUID().toString()
             val configDir = (cordappDir / "config").createDirectories()

@@ -32,7 +32,7 @@ class TestCordappsUtilsTest {
     @Test
     fun `packageAsJar writes out the CorDapp info into the manifest`() {
         val cordapp = cordappForPackages("net.corda.testing.node.internal")
-                .withTargetVersion(123)
+                .withTargetPlatformVersion(123)
                 .withName("TestCordappsUtilsTest")
 
         val jarFile = packageAsJar(cordapp)

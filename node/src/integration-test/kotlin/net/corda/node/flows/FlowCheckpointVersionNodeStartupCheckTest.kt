@@ -92,8 +92,8 @@ class FlowCheckpointVersionNodeStartupCheckTest {
 
             createSuspendedFlowInBob(setOf(originalCordapp))
 
-            // The vendor is part of the MANIFEST so changing it is sufficient to change the jar hash
-            val modifiedCordapp = originalCordapp.withVendor("${originalCordapp.vendor}-modified")
+            // The name is part of the MANIFEST so changing it is sufficient to change the jar hash
+            val modifiedCordapp = originalCordapp.withName("${originalCordapp.name}-modified")
             val modifiedCordappJar = TestCordappDirectories.getJarDirectory(modifiedCordapp).list().single { it.toString().endsWith(".jar") }
             modifiedCordappJar.moveTo(originalCordappJar, REPLACE_EXISTING)
 

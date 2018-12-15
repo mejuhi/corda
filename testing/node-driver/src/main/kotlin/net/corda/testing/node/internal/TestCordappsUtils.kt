@@ -9,7 +9,7 @@ import net.corda.core.internal.cordapp.CordappImpl.Companion.CORDAPP_WORKFLOW_VE
 import net.corda.core.internal.cordapp.CordappImpl.Companion.TARGET_PLATFORM_VERSION
 import net.corda.core.internal.outputStream
 import net.corda.testing.node.TestCordapp
-import java.io.BufferedOutputStream
+import java.io.InputStream
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
 import java.time.Instant
@@ -73,41 +73,48 @@ fun TestCordappImpl.packageAsJar(file: Path) {
             .scan()
 
     scanResult.use {
-        val manifest = createTestManifest(name, title, version, vendor, targetVersion)
         JarOutputStream(file.outputStream()).use { jos ->
-            val time = FileTime.from(Instant.EPOCH)
-            val manifestEntry = ZipEntry(JarFile.MANIFEST_NAME).setCreationTime(time).setLastAccessTime(time).setLastModifiedTime(time)
-            jos.putNextEntry(manifestEntry)
-            manifest.write(BufferedOutputStream(jos))
-            jos.closeEntry()
+            jos.addEntry(testEntry(JarFile.MANIFEST_NAME)) {
+                createTestManifest(name, versionId, targetPlatformVersion).write(jos)
+            }
 
             // The same resource may be found in different locations (this will happen when running from gradle) so just
             // pick the first one found.
             scanResult.allResources.asMap().forEach { path, resourceList ->
-                val entry = ZipEntry(path).setCreationTime(time).setLastAccessTime(time).setLastModifiedTime(time)
-                jos.putNextEntry(entry)
-                resourceList[0].open().use { it.copyTo(jos) }
-                jos.closeEntry()
+                jos.addEntry(testEntry(path), resourceList[0].open())
             }
         }
     }
 }
 
-fun createTestManifest(name: String, title: String, version: String, vendor: String, targetVersion: Int): Manifest {
+private val epochFileTime = FileTime.from(Instant.EPOCH)
+
+private fun testEntry(name: String): ZipEntry {
+    return ZipEntry(name).setCreationTime(epochFileTime).setLastAccessTime(epochFileTime).setLastModifiedTime(epochFileTime)
+}
+
+/** Add a new entry using the entire remaining bytes of [input] for the entry content. [input] will be closed at the end. */
+fun JarOutputStream.addEntry(entry: ZipEntry, input: InputStream) {
+    addEntry(entry) { input.use { it.copyTo(this) } }
+}
+
+inline fun JarOutputStream.addEntry(entry: ZipEntry, write: () -> Unit) {
+    putNextEntry(entry)
+    write()
+    closeEntry()
+}
+
+fun createTestManifest(name: String, versionId: Int, targetPlatformVersion: Int): Manifest {
     val manifest = Manifest()
 
     // Mandatory manifest attribute. If not present, all other entries are silently skipped.
-    manifest[Attributes.Name.MANIFEST_VERSION.toString()] = "1.0"
+    manifest[Attributes.Name.MANIFEST_VERSION] = "1.0"
 
-    manifest["Name"] = name
-    manifest[Attributes.Name.IMPLEMENTATION_TITLE] = title
-    manifest[Attributes.Name.IMPLEMENTATION_VERSION] = version
-    manifest[Attributes.Name.IMPLEMENTATION_VENDOR] = vendor
     manifest[CORDAPP_CONTRACT_NAME]  = name
-    manifest[CORDAPP_CONTRACT_VERSION] = version
+    manifest[CORDAPP_CONTRACT_VERSION] = versionId.toString()
     manifest[CORDAPP_WORKFLOW_NAME]  = name
-    manifest[CORDAPP_WORKFLOW_VERSION] = version
-    manifest[TARGET_PLATFORM_VERSION] = targetVersion.toString()
+    manifest[CORDAPP_WORKFLOW_VERSION] = versionId.toString()
+    manifest[TARGET_PLATFORM_VERSION] = targetPlatformVersion.toString()
 
     return manifest
 }
