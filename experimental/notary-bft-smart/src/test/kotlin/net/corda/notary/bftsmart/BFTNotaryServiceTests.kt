@@ -54,7 +54,7 @@ class BFTNotaryServiceTests {
         @BeforeClass
         @JvmStatic
         fun before() {
-            mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages("net.corda.testing.contracts", "net.corda.notary.bftsmart"))
+            mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages("net.corda.testing.contracts", "net.corda.notary.bftsmart"))
             val clusterSize = minClusterSize(1)
             val started = startBftClusterAndNode(clusterSize, mockNet)
             notary = started.first

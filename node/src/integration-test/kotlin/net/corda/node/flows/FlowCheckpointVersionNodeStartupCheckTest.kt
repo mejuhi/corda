@@ -20,7 +20,7 @@ import net.corda.testing.driver.driver
 import net.corda.testing.node.TestCordapp
 import net.corda.testing.node.internal.ListenProcessDeathException
 import net.corda.testing.node.internal.TestCordappDirectories
-import net.corda.testing.node.internal.cordappForClasses
+import net.corda.testing.node.internal.cordappWithClasses
 import net.test.cordapp.v1.Record
 import net.test.cordapp.v1.SendMessageFlow
 import org.junit.Test
@@ -34,7 +34,7 @@ import kotlin.test.assertNotNull
 class FlowCheckpointVersionNodeStartupCheckTest {
     companion object {
         val message = Message("Hello world!")
-        val defaultCordapp = cordappForClasses(
+        val defaultCordapp = cordappWithClasses(
                 MessageState::class.java,
                 MessageContract::class.java,
                 SendMessageFlow::class.java,

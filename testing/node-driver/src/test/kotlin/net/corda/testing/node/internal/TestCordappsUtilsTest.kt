@@ -31,7 +31,7 @@ class TestCordappsUtilsTest {
 
     @Test
     fun `packageAsJar writes out the CorDapp info into the manifest`() {
-        val cordapp = cordappForPackages("net.corda.testing.node.internal")
+        val cordapp = findCordapp("net.corda.testing.node.internal")
                 .withTargetPlatformVersion(123)
                 .withName("TestCordappsUtilsTest")
 
@@ -45,7 +45,7 @@ class TestCordappsUtilsTest {
 
     @Test
     fun `packageAsJar on leaf package`() {
-        val entries = packageAsJarThenReadBack(cordappForPackages("net.corda.testing.node.internal"))
+        val entries = packageAsJarThenReadBack(findCordapp("net.corda.testing.node.internal"))
 
         assertThat(entries).contains(
                 "net/corda/testing/node/internal/TestCordappsUtilsTest.class",
@@ -60,7 +60,7 @@ class TestCordappsUtilsTest {
 
     @Test
     fun `packageAsJar on package with sub-packages`() {
-        val entries = packageAsJarThenReadBack(cordappForPackages("net.corda.testing.node"))
+        val entries = packageAsJarThenReadBack(findCordapp("net.corda.testing.node"))
 
         assertThat(entries).contains(
                 "net/corda/testing/node/internal/TestCordappsUtilsTest.class",
@@ -71,7 +71,7 @@ class TestCordappsUtilsTest {
 
     @Test
     fun `packageAsJar on single class`() {
-        val entries = packageAsJarThenReadBack(cordappForClasses(InternalMockNetwork::class.java))
+        val entries = packageAsJarThenReadBack(cordappWithClasses(InternalMockNetwork::class.java))
 
         assertThat(entries).containsOnly("${InternalMockNetwork::class.java.name.replace('.', '/')}.class")
     }

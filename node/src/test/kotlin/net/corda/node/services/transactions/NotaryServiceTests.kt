@@ -22,7 +22,6 @@ import net.corda.testing.node.internal.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertFailsWith
 
@@ -36,7 +35,7 @@ class NotaryServiceTests {
     @Before
     fun setup() {
         mockNet = InternalMockNetwork(
-                cordappsForAllNodes = cordappsForPackages("net.corda.testing.contracts"),
+                cordappsForAllNodes = cordappWithPackages("net.corda.testing.contracts"),
                 notarySpecs = listOf(MockNetworkNotarySpec(DUMMY_NOTARY_NAME, validating = false)),
                 initialNetworkParameters = testNetworkParameters(minimumPlatformVersion = 4)
         )

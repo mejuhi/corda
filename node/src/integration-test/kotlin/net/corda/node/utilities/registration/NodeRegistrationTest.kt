@@ -88,7 +88,7 @@ class NodeRegistrationTest {
                 portAllocation = portAllocation,
                 compatibilityZone = compatibilityZone,
                 notarySpecs = listOf(NotarySpec(notaryName)),
-                cordappsForAllNodes = cordappsInCurrentAndAdditionalPackages("net.corda.finance"),
+                extraCordappPackagesToScan = listOf("net.corda.finance"),
                 notaryCustomOverrides = mapOf("devMode" to false)
         ) {
           val (alice, genevieve) = listOf(

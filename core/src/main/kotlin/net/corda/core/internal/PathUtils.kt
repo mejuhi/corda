@@ -41,18 +41,18 @@ fun Path.createDirectories(vararg attrs: FileAttribute<*>): Path = Files.createD
 fun Path.exists(vararg options: LinkOption): Boolean = Files.exists(this, *options)
 
 /** Copy the file into the target directory using [Files.copy]. */
-fun Path.copyToDirectory(targetDir: Path, vararg options: CopyOption): Path {
+/*
+ * We must use fileName.toString() here because resolve(Path)
+ * will throw ProviderMismatchException if the Path parameter
+ * and targetDir have different Path providers, e.g. a file
+ * on the filesystem vs an entry in a ZIP file.
+ *
+ * Path.toString() is assumed safe because fileName should
+ * not include any path separator characters.
+ */
+fun Path.copyToDirectory(targetDir: Path, vararg options: CopyOption, newFileName: String = fileName.toString()): Path {
     require(targetDir.isDirectory()) { "$targetDir is not a directory" }
-    /*
-     * We must use fileName.toString() here because resolve(Path)
-     * will throw ProviderMismatchException if the Path parameter
-     * and targetDir have different Path providers, e.g. a file
-     * on the filesystem vs an entry in a ZIP file.
-     *
-     * Path.toString() is assumed safe because fileName should
-     * not include any path separator characters.
-     */
-    val targetFile = targetDir.resolve(fileName.toString())
+    val targetFile = targetDir.resolve(newFileName)
     Files.copy(this, targetFile, *options)
     return targetFile
 }

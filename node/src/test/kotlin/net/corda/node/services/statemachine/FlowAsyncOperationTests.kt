@@ -13,7 +13,7 @@ import net.corda.core.node.services.CordaService
 import net.corda.core.serialization.SingletonSerializeAsToken
 import net.corda.testing.node.internal.InternalMockNetwork
 import net.corda.testing.node.internal.TestStartedNode
-import net.corda.testing.node.internal.cordappsForPackages
+import net.corda.testing.node.internal.cordappWithPackages
 import net.corda.testing.node.internal.startFlow
 import org.junit.After
 import org.junit.Before
@@ -28,7 +28,7 @@ class FlowAsyncOperationTests {
     @Before
     fun setup() {
         mockNet = InternalMockNetwork(
-                cordappsForAllNodes = cordappsForPackages("net.corda.testing.contracts", "net.corda.node.services.statemachine"),
+                cordappsForAllNodes = cordappWithPackages("net.corda.testing.contracts", "net.corda.node.services.statemachine"),
                 notarySpecs = emptyList()
         )
         aliceNode = mockNet.createNode()

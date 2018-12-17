@@ -99,7 +99,7 @@ class TwoPartyTradeFlowTests(private val anonymous: Boolean) {
         // We run this in parallel threads to help catch any race conditions that may exist. The other tests
         // we run in the unit test thread exclusively to speed things up, ensure deterministic results and
         // allow interruption half way through.
-        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages(cordappPackages), threadPerNode = true)
+        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages(cordappPackages), threadPerNode = true)
         val notaryNode = mockNet.defaultNotaryNode
         val notary = mockNet.defaultNotaryIdentity
         notaryNode.services.ledger(notary) {
@@ -149,7 +149,7 @@ class TwoPartyTradeFlowTests(private val anonymous: Boolean) {
 
     @Test(expected = InsufficientBalanceException::class)
     fun `trade cash for commercial paper fails using soft locking`() {
-        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages(cordappPackages), threadPerNode = true)
+        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages(cordappPackages), threadPerNode = true)
         val notaryNode = mockNet.defaultNotaryNode
         notaryNode.services.ledger(notaryNode.info.singleIdentity()) {
             val aliceNode = mockNet.createPartyNode(ALICE_NAME)
@@ -205,7 +205,7 @@ class TwoPartyTradeFlowTests(private val anonymous: Boolean) {
 
     @Test
     fun `shutdown and restore`() {
-        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages(cordappPackages))
+        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages(cordappPackages))
         val notaryNode = mockNet.defaultNotaryNode
         val notary = mockNet.defaultNotaryIdentity
         notaryNode.services.ledger(notary) {
@@ -314,7 +314,7 @@ class TwoPartyTradeFlowTests(private val anonymous: Boolean) {
 
     @Test
     fun `check dependencies of sale asset are resolved`() {
-        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages(cordappPackages))
+        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages(cordappPackages))
         val notaryNode = mockNet.defaultNotaryNode
         val aliceNode = makeNodeWithTracking(ALICE_NAME)
         val bobNode = makeNodeWithTracking(BOB_NAME)
@@ -417,7 +417,7 @@ class TwoPartyTradeFlowTests(private val anonymous: Boolean) {
 
     @Test
     fun `track works`() {
-        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages(cordappPackages))
+        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages(cordappPackages))
         val notaryNode = mockNet.defaultNotaryNode
         val aliceNode = makeNodeWithTracking(ALICE_NAME)
         val bobNode = makeNodeWithTracking(BOB_NAME)
@@ -498,7 +498,7 @@ class TwoPartyTradeFlowTests(private val anonymous: Boolean) {
 
     @Test
     fun `dependency with error on buyer side`() {
-        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages(cordappPackages))
+        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages(cordappPackages))
         mockNet.defaultNotaryNode.services.ledger(mockNet.defaultNotaryIdentity) {
             runWithError(true, false, "at least one cash input")
         }
@@ -506,7 +506,7 @@ class TwoPartyTradeFlowTests(private val anonymous: Boolean) {
 
     @Test
     fun `dependency with error on seller side`() {
-        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages(cordappPackages))
+        mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages(cordappPackages))
         mockNet.defaultNotaryNode.services.ledger(mockNet.defaultNotaryIdentity) {
             runWithError(false, true, "Issuances have a time-window")
         }

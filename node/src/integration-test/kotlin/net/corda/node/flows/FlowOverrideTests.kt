@@ -12,7 +12,7 @@ import net.corda.testing.core.singleIdentity
 import net.corda.testing.driver.DriverParameters
 import net.corda.testing.driver.NodeParameters
 import net.corda.testing.driver.driver
-import net.corda.testing.node.internal.cordappForClasses
+import net.corda.testing.node.internal.cordappWithClasses
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -70,11 +70,11 @@ class FlowOverrideTests {
         driver(DriverParameters(startNodesInProcess = true, cordappsForAllNodes = emptySet())) {
             val nodeA = startNode(NodeParameters(
                     providedName = ALICE_NAME,
-                    additionalCordapps = setOf(cordappForClasses(*nodeAClasses.toTypedArray()))
+                    additionalCordapps = setOf(cordappWithClasses(*nodeAClasses.toTypedArray()))
             )).getOrThrow()
             val nodeB = startNode(NodeParameters(
                     providedName = BOB_NAME,
-                    additionalCordapps = setOf(cordappForClasses(*nodeBClasses.toTypedArray()))
+                    additionalCordapps = setOf(cordappWithClasses(*nodeBClasses.toTypedArray()))
             )).getOrThrow()
             assertThat(nodeB.rpc.startFlow(::Ping, nodeA.nodeInfo.singleIdentity()).returnValue.getOrThrow(), `is`(Pongiest.GORGONZOLA))
         }
@@ -86,12 +86,12 @@ class FlowOverrideTests {
         driver(DriverParameters(startNodesInProcess = true, cordappsForAllNodes = emptySet())) {
             val nodeA = startNode(NodeParameters(
                     providedName = ALICE_NAME,
-                    additionalCordapps = setOf(cordappForClasses(*nodeAClasses.toTypedArray())),
+                    additionalCordapps = setOf(cordappWithClasses(*nodeAClasses.toTypedArray())),
                     flowOverrides = flowOverrides
             )).getOrThrow()
             val nodeB = startNode(NodeParameters(
                     providedName = BOB_NAME,
-                    additionalCordapps = setOf(cordappForClasses(*nodeBClasses.toTypedArray()))
+                    additionalCordapps = setOf(cordappWithClasses(*nodeBClasses.toTypedArray()))
             )).getOrThrow()
             assertThat(nodeB.rpc.startFlow(::Ping, nodeA.nodeInfo.singleIdentity()).returnValue.getOrThrow(), `is`(Pong.PONG))
         }

@@ -46,7 +46,7 @@ class FinalityHandlerTest {
                 legalName = BOB_NAME,
                 // The node disables the FinalityHandler completely if there are no old CorDapps loaded, so we need to add
                 // a token old CorDapp to keep the handler running.
-                additionalCordapps = setOf(cordappForPackages(javaClass.packageName).withTargetPlatformVersion(3))
+                additionalCordapps = setOf(findCordapp(javaClass.packageName).withTargetPlatformVersion(3))
         ))
 
         val stx = alice.issueCashTo(bob)

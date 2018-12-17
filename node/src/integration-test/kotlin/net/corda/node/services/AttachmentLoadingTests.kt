@@ -34,7 +34,7 @@ import net.corda.testing.driver.driver
 import net.corda.testing.internal.MockCordappConfigProvider
 import net.corda.testing.internal.rigorousMock
 import net.corda.testing.internal.withoutTestSerialization
-import net.corda.testing.node.internal.cordappsForPackages
+import net.corda.testing.node.internal.cordappWithPackages
 import net.corda.testing.services.MockAttachmentStorage
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -104,7 +104,7 @@ class AttachmentLoadingTests {
     fun `test that attachments retrieved over the network are not used for code`() {
         withoutTestSerialization {
             driver(DriverParameters(startNodesInProcess = true, notarySpecs = emptyList(), cordappsForAllNodes = emptySet())) {
-                val additionalCordapps = cordappsForPackages("net.corda.finance.contracts.isolated")
+                val additionalCordapps = cordappWithPackages("net.corda.finance.contracts.isolated")
                 val bankA = startNode(NodeParameters(providedName = bankAName, additionalCordapps = additionalCordapps)).getOrThrow()
                 val bankB = startNode(NodeParameters(providedName = bankBName, additionalCordapps = additionalCordapps)).getOrThrow()
                 assertFailsWith<CordaRuntimeException>("Party C=CH,L=Zurich,O=BankB rejected session request: Don't know net.corda.finance.contracts.isolated.IsolatedDummyFlow\$Initiator") {

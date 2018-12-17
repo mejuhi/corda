@@ -21,7 +21,7 @@ import net.corda.testing.internal.matchers.flow.willReturn
 import net.corda.testing.internal.matchers.hasOnlyEntries
 import net.corda.testing.node.internal.InternalMockNetwork
 import net.corda.testing.node.internal.TestStartedNode
-import net.corda.testing.node.internal.cordappsForPackages
+import net.corda.testing.node.internal.cordappWithPackages
 import net.corda.testing.node.internal.startFlow
 import org.junit.AfterClass
 import org.junit.Test
@@ -33,7 +33,7 @@ class SwapIdentitiesFlowTests {
         private val mockNet = InternalMockNetwork(
                 networkSendManuallyPumped = false,
                 threadPerNode = true,
-                cordappsForAllNodes = cordappsForPackages(this::class.packageName)
+                cordappsForAllNodes = cordappWithPackages(this::class.packageName)
         )
 
         @AfterClass

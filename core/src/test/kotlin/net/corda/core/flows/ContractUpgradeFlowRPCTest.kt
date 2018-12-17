@@ -28,7 +28,7 @@ import org.junit.Test
 
 class ContractUpgradeFlowRPCTest : WithContracts, WithFinality {
     companion object {
-        private val classMockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages("net.corda.testing.contracts", "net.corda.finance.contracts.asset", "net.corda.core.flows"))
+        private val classMockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages("net.corda.testing.contracts", "net.corda.finance.contracts.asset", "net.corda.core.flows"))
 
         @JvmStatic
         @AfterClass

@@ -23,7 +23,7 @@ import net.corda.testing.core.singleIdentity
 import net.corda.testing.driver.NodeParameters
 import net.corda.testing.driver.internal.incrementalPortAllocation
 import net.corda.testing.node.User
-import net.corda.testing.node.internal.cordappForPackages
+import net.corda.testing.node.internal.findCordapp
 import net.corda.testing.node.internal.internalDriver
 import org.junit.Assume.assumeFalse
 import org.junit.Test
@@ -34,7 +34,7 @@ import kotlin.test.assertNotNull
 
 class SignatureConstraintVersioningTests {
 
-    private val base = cordappForPackages(MessageState::class.packageName, DummyMessageContract::class.packageName)
+    private val base = findCordapp(MessageState::class.packageName, DummyMessageContract::class.packageName)
     private val oldCordapp = base.withVersionId(2)
     private val newCordapp = base.withVersionId(3)
     private val user = User("mark", "dadada", setOf(startFlow<CreateMessage>(), startFlow<ConsumeMessage>(), invokeRpc("vaultQuery")))

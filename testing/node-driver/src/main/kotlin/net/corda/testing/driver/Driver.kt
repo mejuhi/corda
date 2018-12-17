@@ -6,6 +6,7 @@ import net.corda.core.DoNotImplement
 import net.corda.core.concurrent.CordaFuture
 import net.corda.core.flows.FlowLogic
 import net.corda.core.identity.Party
+import net.corda.core.internal.uncheckedCast
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.node.NetworkParameters
 import net.corda.core.node.NodeInfo
@@ -19,7 +20,10 @@ import net.corda.testing.driver.internal.internalServices
 import net.corda.testing.node.NotarySpec
 import net.corda.testing.node.TestCordapp
 import net.corda.testing.node.User
-import net.corda.testing.node.internal.*
+import net.corda.testing.node.internal.DriverDSLImpl
+import net.corda.testing.node.internal.genericDriver
+import net.corda.testing.node.internal.getTimestampAsDirectoryName
+import net.corda.testing.node.internal.newContext
 import rx.Observable
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -136,7 +140,8 @@ constructor(
         val startJmxHttpServer: Boolean = false,
         val jmxHttpServerPortAllocation: PortAllocation = incrementalPortAllocation(7005)
 ) {
-    @Deprecated("The default constructor does not turn on monitoring. Simply leave the jmxPolicy parameter unspecified if you wish to not have monitoring turned on.")
+    @Deprecated("The default constructor does not turn on monitoring. Simply leave the jmxPolicy parameter unspecified if you wish to not " +
+            "have monitoring turned on.")
     constructor() : this(false)
 
     /** Create a [JmxPolicy] that turns on monitoring using the given [PortAllocation]. */
@@ -178,14 +183,14 @@ fun <A> driver(defaultParameters: DriverParameters = DriverParameters(), dsl: Dr
                     isDebug = defaultParameters.isDebug,
                     startNodesInProcess = defaultParameters.startNodesInProcess,
                     waitForAllNodesToFinish = defaultParameters.waitForAllNodesToFinish,
+                    extraCordappPackagesToScan = defaultParameters.extraCordappPackagesToScan,
                     notarySpecs = defaultParameters.notarySpecs,
                     jmxPolicy = defaultParameters.jmxPolicy,
                     compatibilityZone = null,
                     networkParameters = defaultParameters.networkParameters,
                     notaryCustomOverrides = defaultParameters.notaryCustomOverrides,
                     inMemoryDB = defaultParameters.inMemoryDB,
-                    cordappsForAllNodes = defaultParameters.cordappsForAllNodes(),
-                    signCordapps = false
+                    cordappsForAllNodes = uncheckedCast(defaultParameters.cordappsForAllNodes)
             ),
             coerce = { it },
             dsl = dsl
@@ -211,8 +216,11 @@ fun <A> driver(defaultParameters: DriverParameters = DriverParameters(), dsl: Dr
  * @property notarySpecs The notaries advertised for this network. These nodes will be started automatically and will be
  *     available from [DriverDSL.notaryHandles], and will be added automatically to the network parameters.
  *     Defaults to a simple validating notary.
- * @property extraCordappPackagesToScan A [List] of additional cordapp packages to scan for any cordapp code, e.g.
- *     contract verification code, flows and services. The calling package is automatically added.
+ * @property extraCordappPackagesToScan A list of packages to scan to find CorDapps on the current classpath. All the CorDapps found are added
+ * to every single node. The calling package is automatically included in this list. If this is not desirable then use [cordappsForAllNodes]
+ * instead.
+ *
+ * This parameter is only here for backwards compatibility. You may find that [cordappsForAllNodes] gives you more control.
  * @property jmxPolicy Used to specify whether to expose JMX metrics via Jolokia HHTP/JSON.
  * @property networkParameters The network parameters to be used by all the nodes. [NetworkParameters.notaries] must be
  *     empty as notaries are defined by [notarySpecs].
@@ -220,7 +228,8 @@ fun <A> driver(defaultParameters: DriverParameters = DriverParameters(), dsl: Dr
  * @property inMemoryDB Whether to use in-memory H2 for new nodes rather then on-disk (the node starts quicker, however
  *     the data is not persisted between node restarts). Has no effect if node is configured
  *     in any way to use database other than H2.
- * @property cordappsForAllNodes [TestCordapp]s that will be added to each node started by the [DriverDSL].
+ * @property cordappsForAllNodes [TestCordapp]s that will be added to each node started by the [DriverDSL]. If an empty is provided then
+ * the calling package is automatically included, even if [extraCordappPackagesToScan] is specified.
  */
 @Suppress("unused")
 data class DriverParameters(

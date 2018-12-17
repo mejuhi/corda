@@ -15,7 +15,7 @@ import net.corda.testing.driver.driver
 import net.corda.testing.driver.internal.InProcessImpl
 import net.corda.testing.internal.vault.DummyLinearStateSchemaV1
 import net.corda.testing.node.internal.InternalMockNetwork
-import net.corda.testing.node.internal.cordappsForPackages
+import net.corda.testing.node.internal.cordappWithPackages
 import org.hibernate.annotations.Cascade
 import org.hibernate.annotations.CascadeType
 import org.junit.Ignore
@@ -30,7 +30,7 @@ class NodeSchemaServiceTest {
      */
     @Test
     fun `registering custom schemas for testing with MockNode`() {
-        val mockNet = InternalMockNetwork(cordappsForAllNodes = cordappsForPackages(DummyLinearStateSchemaV1::class.packageName))
+        val mockNet = InternalMockNetwork(cordappsForAllNodes = cordappWithPackages(DummyLinearStateSchemaV1::class.packageName))
         val mockNode = mockNet.createNode()
         val schemaService = mockNode.services.schemaService
         assertTrue(schemaService.schemaOptions.containsKey(DummyLinearStateSchemaV1))

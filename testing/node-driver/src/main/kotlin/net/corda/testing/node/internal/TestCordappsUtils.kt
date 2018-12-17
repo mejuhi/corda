@@ -1,41 +1,37 @@
 package net.corda.testing.node.internal
 
-import io.github.classgraph.ClassGraph
 import net.corda.core.internal.cordapp.*
 import net.corda.core.internal.cordapp.CordappImpl.Companion.CORDAPP_CONTRACT_NAME
 import net.corda.core.internal.cordapp.CordappImpl.Companion.CORDAPP_CONTRACT_VERSION
 import net.corda.core.internal.cordapp.CordappImpl.Companion.CORDAPP_WORKFLOW_NAME
 import net.corda.core.internal.cordapp.CordappImpl.Companion.CORDAPP_WORKFLOW_VERSION
 import net.corda.core.internal.cordapp.CordappImpl.Companion.TARGET_PLATFORM_VERSION
-import net.corda.core.internal.outputStream
 import net.corda.testing.node.TestCordapp
 import java.io.InputStream
-import java.nio.file.Path
-import java.nio.file.attribute.FileTime
-import java.time.Instant
 import java.util.jar.Attributes
-import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 import java.util.jar.Manifest
 import java.util.zip.ZipEntry
 import kotlin.reflect.KClass
 
 @JvmField
-val FINANCE_CORDAPP: TestCordappImpl = cordappForPackages("net.corda.finance")
+val FINANCE_CORDAPP: TestCordappImpl = findCordapp("net.corda.finance")
 
-/** Creates a [TestCordappImpl] for each package. */
-fun cordappsForPackages(vararg packageNames: String): List<TestCordappImpl> = cordappsForPackages(packageNames.asList())
+/**
+ * Find the single CorDapp jar on the current classpath which contains the given package.
+ *
+ * This is a convenience method for [TestCordapp.Factory.findCordapp] but returns the internal [TestCordappImpl].
+ */
+fun findCordapp(packageName: String): TestCordappImpl = TestCordapp.Factory.findCordapp(packageName) as TestCordappImpl
 
-fun cordappsForPackages(packageNames: Iterable<String>): List<TestCordappImpl> {
-    return simplifyScanPackages(packageNames).map { cordappForPackages(it) }
-}
+/** Create a *custom* CorDapp which contains all the classes and resoures located in the given packages. */
+fun cordappWithPackages(vararg packageNames: String): CustomCordapp = cordappWithPackages(packageNames.asList())
 
-/** Creates a single [TestCordappImpl] containing all the given packges. */
-fun cordappForPackages(vararg packageNames: String): TestCordappImpl {
-    return TestCordapp.Factory.fromPackages(*packageNames) as TestCordappImpl
-}
+/** Create a *custom* CorDapp which contains all the classes and resoures located in the given packages. */
+fun cordappWithPackages(packageNames: Iterable<String>): CustomCordapp = CustomCordapp(packages = simplifyScanPackages(packageNames))
 
-fun cordappForClasses(vararg classes: Class<*>): TestCordappImpl = cordappForPackages().withClasses(*classes)
+/** Create a *custom* CorDapp which contains just the given classes. */
+fun cordappWithClasses(vararg classes: Class<*>): CustomCordapp = CustomCordapp(packages = emptySet(), classes = classes.toSet())
 
 fun getCallerClass(directCallerClass: KClass<*>): Class<*>? {
     val stackTrace = Throwable().stackTrace
@@ -61,36 +57,6 @@ fun simplifyScanPackages(scanPackages: Iterable<String>): Set<String> {
             else -> soFar + packageName
         }
     }
-}
-
-fun TestCordappImpl.packageAsJar(file: Path) {
-    // Don't mention "classes" in the error message as that feature is only available internally
-    require(packages.isNotEmpty() || classes.isNotEmpty()) { "At least one package must be specified" }
-
-    val scanResult = ClassGraph()
-            .whitelistPackages(*packages.toTypedArray())
-            .whitelistClasses(*classes.map { it.name }.toTypedArray())
-            .scan()
-
-    scanResult.use {
-        JarOutputStream(file.outputStream()).use { jos ->
-            jos.addEntry(testEntry(JarFile.MANIFEST_NAME)) {
-                createTestManifest(name, versionId, targetPlatformVersion).write(jos)
-            }
-
-            // The same resource may be found in different locations (this will happen when running from gradle) so just
-            // pick the first one found.
-            scanResult.allResources.asMap().forEach { path, resourceList ->
-                jos.addEntry(testEntry(path), resourceList[0].open())
-            }
-        }
-    }
-}
-
-private val epochFileTime = FileTime.from(Instant.EPOCH)
-
-private fun testEntry(name: String): ZipEntry {
-    return ZipEntry(name).setCreationTime(epochFileTime).setLastAccessTime(epochFileTime).setLastModifiedTime(epochFileTime)
 }
 
 /** Add a new entry using the entire remaining bytes of [input] for the entry content. [input] will be closed at the end. */

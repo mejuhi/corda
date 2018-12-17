@@ -44,7 +44,7 @@ class CordappConstraintsTests {
                 inMemoryDB = false
         )) {
 
-            val alice = startNode(NodeParameters(additionalCordapps = listOf(FINANCE_CORDAPP.signJar()),
+            val alice = startNode(NodeParameters(additionalCordapps = listOf(FINANCE_CORDAPP.signed()),
                     providedName = ALICE_NAME,
                     rpcUsers = listOf(user))).getOrThrow()
 
@@ -91,7 +91,7 @@ class CordappConstraintsTests {
 
             println("Restarting the node using signed contract jar ...")
             val restartedNode = startNode(NodeParameters(providedName = ALICE_NAME,
-                    additionalCordapps = listOf(FINANCE_CORDAPP.signJar()),
+                    additionalCordapps = listOf(FINANCE_CORDAPP.signed()),
                     regenerateCordappsOnStart = true
             )).getOrThrow()
 
@@ -174,14 +174,14 @@ class CordappConstraintsTests {
 
     @Test
     fun `issue and consume cash using signature constraints`() {
-        driver(DriverParameters(cordappsForAllNodes = listOf(FINANCE_CORDAPP.signJar()),
+        driver(DriverParameters(
                 extraCordappPackagesToScan = listOf("net.corda.finance"),
                 networkParameters = testNetworkParameters(minimumPlatformVersion = 4),
-                inMemoryDB = false)) {
-
+                inMemoryDB = false
+        )) {
             val (alice, bob) = listOf(
-                    startNode(NodeParameters(providedName = ALICE_NAME, rpcUsers = listOf(user), additionalCordapps = listOf(FINANCE_CORDAPP.signJar()))),
-                    startNode(NodeParameters(providedName = BOB_NAME, rpcUsers = listOf(user), additionalCordapps = listOf(FINANCE_CORDAPP.signJar())))
+                    startNode(NodeParameters(providedName = ALICE_NAME, rpcUsers = listOf(user), additionalCordapps = listOf(FINANCE_CORDAPP.signed()))),
+                    startNode(NodeParameters(providedName = BOB_NAME, rpcUsers = listOf(user), additionalCordapps = listOf(FINANCE_CORDAPP.signed())))
             ).map { it.getOrThrow() }
 
             // Issue Cash
@@ -271,13 +271,13 @@ class CordappConstraintsTests {
 
             println("Restarting the node for $ALICE_NAME ...")
             val restartedAlice = startNode(NodeParameters(providedName = ALICE_NAME,
-                    additionalCordapps = listOf(FINANCE_CORDAPP.signJar(keyStoreDir.path)),
+                    additionalCordapps = listOf(FINANCE_CORDAPP.signed(keyStoreDir.path)),
                     regenerateCordappsOnStart = true
             )).getOrThrow()
 
             println("Restarting the node for $BOB_NAME ...")
             val restartedBob = startNode(NodeParameters(providedName = BOB_NAME,
-                    additionalCordapps = listOf(FINANCE_CORDAPP.signJar(keyStoreDir.path)),
+                    additionalCordapps = listOf(FINANCE_CORDAPP.signed(keyStoreDir.path)),
                     regenerateCordappsOnStart = true
             )).getOrThrow()
 

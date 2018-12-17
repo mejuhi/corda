@@ -60,7 +60,7 @@ class NotaryWhitelistTests(
     @Before
     fun setup() {
         mockNet = InternalMockNetwork(
-                cordappsForAllNodes = cordappsForPackages("net.corda.testing.contracts"),
+                cordappsForAllNodes = cordappWithPackages("net.corda.testing.contracts"),
                 notarySpecs = listOf(MockNetworkNotarySpec(oldNotaryName, validating = isValidating), MockNetworkNotarySpec(newNotaryName, validating = isValidating)),
                 initialNetworkParameters = testNetworkParameters(minimumPlatformVersion = 4)
         )

@@ -121,7 +121,7 @@ constructor(private val cordappPackages: List<String> = emptyList(), private val
                 ) + configOverrides
         )
 
-        val cordapps = cordappsForPackages(getCallerPackage(NodeBasedTest::class)?.let { cordappPackages + it }
+        val cordapps = cordappWithPackages(getCallerPackage(NodeBasedTest::class)?.let { cordappPackages + it }
                 ?: cordappPackages)
 
         val existingCorDappDirectoriesOption = if (config.hasPath(NodeConfiguration.cordappDirectoriesKey)) config.getStringList(NodeConfiguration.cordappDirectoriesKey) else emptyList()

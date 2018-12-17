@@ -292,23 +292,20 @@ open class MockNetwork(
         val threadPerNode: Boolean = defaultParameters.threadPerNode,
         val servicePeerAllocationStrategy: InMemoryMessagingNetwork.ServicePeerAllocationStrategy = defaultParameters.servicePeerAllocationStrategy,
         val notarySpecs: List<MockNetworkNotarySpec> = defaultParameters.notarySpecs,
-        val networkParameters: NetworkParameters = defaultParameters.networkParameters,
-        val cordappsForAllNodes: Collection<TestCordapp> = cordappsForPackages(cordappPackages)) {
+        val networkParameters: NetworkParameters = defaultParameters.networkParameters
+) {
 
     @JvmOverloads
     constructor(cordappPackages: List<String>, parameters: MockNetworkParameters = MockNetworkParameters()) : this(cordappPackages, defaultParameters = parameters)
 
-    constructor(
-            cordappPackages: List<String>,
-            defaultParameters: MockNetworkParameters = MockNetworkParameters(),
-            networkSendManuallyPumped: Boolean = defaultParameters.networkSendManuallyPumped,
-            threadPerNode: Boolean = defaultParameters.threadPerNode,
-            servicePeerAllocationStrategy: InMemoryMessagingNetwork.ServicePeerAllocationStrategy = defaultParameters.servicePeerAllocationStrategy,
-            notarySpecs: List<MockNetworkNotarySpec> = defaultParameters.notarySpecs,
-            networkParameters: NetworkParameters = defaultParameters.networkParameters
-    ) : this(emptyList(), defaultParameters, networkSendManuallyPumped, threadPerNode, servicePeerAllocationStrategy, notarySpecs, networkParameters, cordappsForAllNodes = cordappsForPackages(cordappPackages))
-
-    private val internalMockNetwork: InternalMockNetwork = InternalMockNetwork(defaultParameters, networkSendManuallyPumped, threadPerNode, servicePeerAllocationStrategy, notarySpecs, initialNetworkParameters = networkParameters, cordappsForAllNodes = cordappsForAllNodes)
+    private val internalMockNetwork = InternalMockNetwork(
+            defaultParameters,
+            networkSendManuallyPumped,
+            threadPerNode,
+            servicePeerAllocationStrategy,
+            notarySpecs,
+            initialNetworkParameters = networkParameters
+    )
 
     /** In a mock network, nodes have an incrementing integer ID. Real networks do not have this. Returns the next ID that will be used. */
     val nextNodeId get(): Int = internalMockNetwork.nextNodeId
@@ -355,7 +352,7 @@ open class MockNetwork(
                    configOverrides: MockNodeConfigOverrides? = null,
                    extraCordappPackages: List<String> = emptyList()): StartedMockNode {
 
-        return createNode(legalName, forcedID, entropyRoot, configOverrides, cordappsForPackages(extraCordappPackages))
+        return createNode(legalName, forcedID, entropyRoot, configOverrides, cordappWithPackages(extraCordappPackages))
     }
 
     /**
@@ -397,7 +394,7 @@ open class MockNetwork(
                             configOverrides: MockNodeConfigOverrides? = null,
                             extraCordappPackages: List<String> = emptyList()): UnstartedMockNode {
 
-        return createUnstartedNode(legalName, forcedID, entropyRoot, configOverrides, cordappsForPackages(extraCordappPackages))
+        return createUnstartedNode(legalName, forcedID, entropyRoot, configOverrides, cordappWithPackages(extraCordappPackages))
     }
 
     /**

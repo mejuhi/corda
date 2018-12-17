@@ -42,7 +42,7 @@ class ScheduledFlowsDrainingModeTest {
     @Before
     fun setup() {
         mockNet = InternalMockNetwork(
-                cordappsForAllNodes = cordappsForPackages("net.corda.testing.contracts", javaClass.packageName),
+                cordappsForAllNodes = cordappWithPackages("net.corda.testing.contracts", javaClass.packageName),
                 threadPerNode = true
         )
         aliceNode = mockNet.createNode(InternalMockNodeParameters(legalName = ALICE_NAME))

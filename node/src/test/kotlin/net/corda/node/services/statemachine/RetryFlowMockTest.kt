@@ -39,7 +39,7 @@ class RetryFlowMockTest {
 
     @Before
     fun start() {
-        mockNet = InternalMockNetwork(threadPerNode = true, cordappsForAllNodes = cordappsForPackages(this.javaClass.packageName))
+        mockNet = InternalMockNetwork(threadPerNode = true, cordappsForAllNodes = cordappWithPackages(this.javaClass.packageName))
         nodeA = mockNet.createNode()
         nodeB = mockNet.createNode()
         mockNet.startNodes()

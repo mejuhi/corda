@@ -1,6 +1,8 @@
 package net.corda.traderdemo
 
+import io.github.classgraph.ClassGraph
 import net.corda.client.rpc.CordaRPCClient
+import net.corda.core.internal.*
 import net.corda.core.messaging.startFlow
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.millis
@@ -18,15 +20,24 @@ import net.corda.testing.driver.InProcess
 import net.corda.testing.driver.OutOfProcess
 import net.corda.testing.driver.driver
 import net.corda.testing.node.User
+import net.corda.testing.node.internal.ProcessUtilities
 import net.corda.testing.node.internal.poll
 import net.corda.traderdemo.flow.CommercialPaperIssueFlow
 import net.corda.traderdemo.flow.SellerFlow
+import org.apache.commons.lang.SystemUtils
+import org.apache.sshd.common.util.OsUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import java.io.File
+import java.nio.file.FileSystem
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.concurrent.Executors
+import java.util.jar.JarInputStream
+import java.util.jar.Manifest
 
 class TraderDemoTest {
-    @Test
+//    @Test
     fun `runs trader demo`() {
         val demoUser = User("demo", "demo", setOf(startFlow<SellerFlow>(), all()))
         val bankUser = User("user1", "test", permissions = setOf(
@@ -75,7 +86,7 @@ class TraderDemoTest {
         }
     }
 
-    @Test
+//    @Test
     fun `Tudor test`() {
         driver(DriverParameters(startNodesInProcess = false, inMemoryDB = false, extraCordappPackagesToScan = listOf("net.corda.finance"))) {
             val demoUser = User("demo", "demo", setOf(startFlow<SellerFlow>(), all()))
@@ -99,6 +110,55 @@ class TraderDemoTest {
             nodeA.stop()
             startNode(providedName = DUMMY_BANK_A_NAME, rpcUsers = listOf(demoUser), customOverrides = mapOf("p2pAddress" to nodeA.p2pAddress.toString()))
             stxFuture.getOrThrow()
+        }
+    }
+
+    @Test
+    fun d() {
+        val scanResult = ClassGraph()
+                .whitelistPackages("net.corda.finance", javaClass.packageName)
+                .scan()
+
+        scanResult.use {
+            scanResult.allResources
+                    .asSequence()
+                    .map { resource ->
+                        val path = resource.classpathElementURL.toPath()
+                        if (path.toString().endsWith(".jar")) path else findProjectRoot(path)
+                    }
+                    .distinct()
+                    .forEach {
+                        if (it.toString().endsWith(".jar")) {
+                            val manifest: Manifest? = JarInputStream(it.inputStream()).use { it.manifest }
+                            println(it)
+                            manifest?.mainAttributes?.entries?.forEach { println(it) }
+                        } else {
+                            val gradlew = findGradlewDir(it) / (if (SystemUtils.IS_OS_WINDOWS) "gradlew.bat" else "gradlew")
+                            ProcessBuilder(gradlew.toString(), "jar").directory(it.toFile()).inheritIO().start().waitFor()
+                            println(it)
+                        }
+                        println()
+                    }
+        }
+    }
+
+    private fun findProjectRoot(path: Path): Path {
+        var current = path
+        while (true) {
+            if ((current / "build.gradle").exists()) {
+                return current
+            }
+            current = current.parent
+        }
+    }
+
+    private fun findGradlewDir(path: Path): Path {
+        var current = path
+        while (true) {
+            if ((current / "gradlew").exists() && (current / "gradlew.bat").exists()) {
+                return current
+            }
+            current = current.parent
         }
     }
 }
